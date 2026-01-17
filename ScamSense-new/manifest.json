@@ -6,7 +6,7 @@
   "action": {
     "default_popup": "popup.html"
 },
-  "permissions": [],
+  "permissions": ["activetab","scripting"],
   "host_permissions": ["https://api.openai.com/*"]
   
 }
