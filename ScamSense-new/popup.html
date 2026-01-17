@@ -1,19 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>ScamSense</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8" />
+    <title>ScamSense</title>
+    <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>ScamSense</h1>
+    <h1>ScamSense</h1>
 
-  <textarea id="input" placeholder="Paste suspicious text or URL"></textarea>
+    <textarea id="input" placeholder="Paste suspicious text or URL"></textarea>
 
-  <button id="analyze">Analyze</button>
+    <button id="analyze">Analyze</button>
 
-  <div id="result"></div>
+    <div class="results">
+        <div class="card">
+            <h2>Gemini</h2>
+            <div id="geminiResult">Waiting...</div>
+        </div>
 
-  <script src="popup.js"></script>
+        <div class="card">
+            <h2>OpenAI</h2>
+            <div id="openaiResult">Waiting...</div>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
 </body>
 </html>
