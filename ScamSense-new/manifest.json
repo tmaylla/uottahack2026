@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "Scam Detector",
+  "description": "Check if a URL or message is a scam",
+  "version": "1.0",
+  "action": {
+    "default_popup": "popup.html"
+},
+  "permissions": []
+}
