@@ -1,4 +1,4 @@
-const API_KEY = "AIzaSyB7TRGHZ7ar52s_rf4ASt4AV821Q3hKSPw";
+const API_KEY = "AIzaSyC2yntuFTRrs4bcaKe62-kvSQYhhS1Ne0A";
 
 const analyzeBtn = document.getElementById("analyzeBtn");
 const inputContent = document.getElementById("inputContent");
@@ -37,7 +37,7 @@ analyzeBtn.addEventListener("click", async () => {
     const text =
       data.candidates?.[0]?.content?.parts?.[0]?.text || "No response";
 
-    resultCard.textContent = text;
+    geminiResult.textContent = text;
 
     history.push({
       content: url,
@@ -49,7 +49,7 @@ analyzeBtn.addEventListener("click", async () => {
 
   } catch (err) {
     console.error(err);
-    resultCard.textContent = "Error: " + err.message;
+    geminiResult.textContent = "Error: " + err.message;
   }
 });
 
