@@ -45,7 +45,7 @@ async function analyzeWithOpenAI(content) {
 }
 
 
-analyzeBtn.addEventListener("click", async () => {
+analyzeBtn.addEventListener("click", async () => {analyzeBtn.addEventListener("click", async () => {
   const content = inputContent.value.trim();
   if (!content) return;
 
@@ -61,11 +61,17 @@ analyzeBtn.addEventListener("click", async () => {
     renderResult(geminiResult, gemini);
     renderResult(openaiResult, openai);
 
+    history.push({ content, ...gemini, model: "Gemini" });
+    history.push({ content, ...openai, model: "OpenAI" });
+    renderHistory();
+
   } catch (err) {
     console.error(err);
     geminiResult.textContent = "Error";
     openaiResult.textContent = "Error";
   }
+});
+
 });
 
 function scamPrompt(type, content) {
