@@ -1,0 +1,92 @@
+/* popup.css */
+body {
+    width: 350px; /* Essential for extension popups */
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #030712;
+    color: white;
+    padding: 1rem;
+}
+
+.container { display: flex; flex-direction: column; gap: 1rem; }
+
+h1 { 
+    text-align: center; 
+    font-size: 1.5rem; 
+    background: linear-gradient(to right, #60a5fa, #a855f7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+textarea {
+    width: 100%;
+    height: 80px;
+    background: #111827;
+    border: 1px solid #374151;
+    border-radius: 0.5rem;
+    color: white;
+    padding: 0.5rem;
+    box-sizing: border-box;
+}
+
+button {
+    width: 100%;
+    padding: 0.75rem;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover { background: #1d4ed8; }
+
+/* The Result Card */
+#resultCard {
+    background: #111827;
+    border: 1px solid #374151;
+    border-radius: 0.75rem;
+    margin-top: 1rem;
+    display: none; /* Hidden by default */
+}
+
+#resultCard.visible { display: block; }
+
+.status-bar {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid #1f2937;
+    font-size: 0.75rem;
+}
+
+.confidence-box { padding: 1rem; }
+
+.bar-bg { background: #1f2937; height: 8px; border-radius: 10px; width: 100%; }
+#confidenceBar { height: 8px; border-radius: 10px; transition: width 1s; }
+
+.analysis-box { background: rgba(31, 41, 55, 0.5); padding: 1rem; font-size: 0.85rem; }
+
+.hidden { display: none; }
+
+.safe-status { 
+    background-color: rgba(6, 78, 59, 0.3) !important; 
+    color: #34d399 !important; 
+    border: 1px solid rgba(52, 211, 153, 0.5) !important; 
+}
+.safe-bar { background-color: #10b981 !important; }
+
+.suspicious-status { 
+    background-color: rgba(120, 53, 15, 0.3) !important; 
+    color: #fbbf24 !important; 
+    border: 1px solid rgba(251, 191, 36, 0.5) !important; 
+}
+.suspicious-bar { background-color: #f59e0b !important; }
+
+.scam-status { 
+    background-color: rgba(127, 29, 29, 0.3) !important; 
+    color: #f87171 !important; 
+    border: 1px solid rgba(248, 113, 113, 0.5) !important; 
+}
+.scam-bar { background-color: #ef4444 !important; }

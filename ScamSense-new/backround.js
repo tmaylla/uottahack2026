@@ -1,11 +1,11 @@
-const geminiAPI_KEY = "AIzaSyB7TRGHZ7ar52s_rf4ASt4AV821Q3hKSPw";
+const API_KEY = "AIzaSyD74zbKZRrThGpF-Em0HLIIGUHxHe_6SVA";
 let lastNotifiedDomains = {};
 
 // 1. AI Analysis Function
 async function analyzeUrl(url) {
   try {
     const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${geminiAPI_KEY}`,
+     // `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${API_KEY}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
