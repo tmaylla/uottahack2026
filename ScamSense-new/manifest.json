@@ -3,10 +3,25 @@
   "name": "Scam Detector",
   "description": "Check if a URL or message is a scam",
   "version": "1.0",
+
   "action": {
     "default_popup": "popup.html"
-},
-  "permissions": ["tabs","activetab","scripting"],
-  "host_permissions": ["https://api.openai.com/*"]
-  
+  },
+
+  "background": {
+    "service_worker": "backround.js"
+  },
+
+  "permissions": [
+    "tabs",
+    "activeTab",
+    "scripting",
+    "notifications"
+  ],
+
+  "host_permissions": [
+    "https://api.openai.com/*",
+    "http://*/*",
+    "https://*/*"
+  ]
 }
