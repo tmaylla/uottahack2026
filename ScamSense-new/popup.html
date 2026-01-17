@@ -1,20 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Scam Detector</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8" />
+  <title>ScamSense</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center p-4">
+<body>
+  <h1>ScamSense</h1>
 
-  <h1 class="text-2xl font-bold mb-4 text-center">Is it a <span class="text-yellow-400">Scam?</span></h1>
+  <textarea id="input" placeholder="Paste suspicious text or URL"></textarea>
 
-  <textarea id="inputContent" rows="3" class="w-full p-2 rounded mb-2 bg-gray-700 text-white" placeholder="Paste URL or text"></textarea>
-  <button id="analyzeBtn" class="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-2 rounded mb-2">Analyze</button>
+  <button id="analyze">Analyze</button>
 
-  <div id="resultCard" class="w-full p-2 rounded hidden"></div>
-  <div id="historyList" class="w-full mt-2 space-y-1"></div>
+  <div id="result"></div>
 
   <script src="popup.js"></script>
 </body>
