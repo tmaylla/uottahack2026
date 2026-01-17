@@ -31,7 +31,7 @@ async function analyzeWithOpenAI(content) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${OPENAI_API_KEY}`
+      "Authorization": `Bearer ${OpenAiAPI_KEY}`
     },
     body: JSON.stringify({
       model: "gpt-4.1-mini",
@@ -45,7 +45,8 @@ async function analyzeWithOpenAI(content) {
 }
 
 
-analyzeBtn.addEventListener("click", async () => {const content = inputContent.value.trim();
+analyzeBtn.addEventListener("click", async () => {
+  const content = inputContent.value.trim();
   if (!content) return;
 
   geminiResult.textContent = "⏳ Analyzing...";
