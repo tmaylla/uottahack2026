@@ -1,75 +1,58 @@
-// Memory cache to save results and prevent re-calling Gemini for the same page
+// Memory cache to prevent duplicate API calls
 const analysisCache = new Map();
 
+// 1. Listen for the message from content.js
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    // Check if the message is the one we expect
+    if (message.type === "ANALYZE_PAGE" && sender.tab) {
+        const url = message.url;
+        const textToAnalyze = message.text;
 
-async function callScamSenseAPI(url, content) {
-    // 1. Check if we already have a result for this URL
-    if (analysisCache.has(url)) {
-        console.log("ScamSense: Using cached result for:", url);
-        return analysisCache.get(url);
-    }
+        console.log("Background: Received text from tab", sender.tab.id);
 
-    try {
-        console.log("ScamSense: Sending request to server...");
-        
-        const response = await fetch("https://uottahack2026.onrender.com/api/analyze", {
+        // 2. Cache Check (Save tokens)
+        if (analysisCache.has(url)) {
+            console.log("Background: Using cached result for", url);
+            const cachedData = analysisCache.get(url);
+            sendWarningIfScam(sender.tab.id, cachedData);
+            return true;
+        }
+
+        // 3. Call your working Server API
+        // NOTE: We use the key 'text' to match your working manual code
+        fetch("https://uottahack2026.onrender.com/api/analyze", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ 
-                url: url, 
-                content: content 
+                url: url,
+                text: textToAnalyze // Match the key your manual code used
             })
+        })
+        .then(res => {
+            if (!res.ok) throw new Error(`Server Status: ${res.status}`);
+            return res.json();
+        })
+        .then(data => {
+            console.log("Background: AI Result received:", data.result);
+            
+            // 4. Save to cache and trigger warning
+            analysisCache.set(url, data);
+            sendWarningIfScam(sender.tab.id, data);
+        })
+        .catch(err => {
+            console.error("Background: API Error:", err);
         });
 
-        
-        if (response.status === 429) {
-            return { result: "error", analysis: "Rate limit reached. Please wait a minute." };
-        }
+        return true; // Keeps the messaging channel open for the async fetch
+    }
+});
 
-        if (!response.ok) {
-            throw new Error(`Server returned ${response.status}`);
-        }
-
-        const data = await response.json();
-        
-        // 2. Save the result in cache if successful
-        if (data && data.result) {
-            analysisCache.set(url, data);
-        }
-        
-        return data;
-
-    } catch (err) {
-        console.error("ScamSense API Error:", err);
-        return null;
+// Helper function to send the warning back to the specific tab
+function sendWarningIfScam(tabId, data) {
+    if (data && (data.result === "scam" || data.result === "suspicious")) {
+        chrome.tabs.sendMessage(tabId, {
+            action: "show_warning",
+            data: data
+        });
     }
 }
-
-/**
- * Listen for messages from content.js
- */
-chrome.runtime.onMessage.addListener((message, sender) => {
-    if (message.type === "ANALYZE_PAGE" && sender.tab) {
-        
-        // Trigger the analysis
-        callScamSenseAPI(message.url, message.text).then(data => {
-            
-            // Only show the warning if the result is NOT "safe"
-            if (data && (data.result === "scam" || data.result === "suspicious")) {
-                chrome.tabs.sendMessage(sender.tab.id, {
-                    action: "show_warning",
-                    data: data
-                });
-            }
-        });
-    }
-    // Required to keep the message port open for the async fetch
-    return true; 
-});
-
-/**
- * Clean up memory when a tab is closed
- */
-chrome.tabs.onRemoved.addListener((tabId) => {
-   
-});
