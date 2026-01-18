@@ -7,7 +7,7 @@
     "default_popup": "popup.html"
   },
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "backround.js"
   },
   "permissions": [
     "tabs",
@@ -22,6 +22,6 @@
     }
   ],
   "host_permissions": [
-"https://uottahack2026.onrender.com"  ]
+"https://uottahack2026.onrender.com/*"  ]
 }
 

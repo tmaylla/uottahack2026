@@ -1,9 +1,3 @@
-const res = await fetch("https://uottahack2026.onrender.com/api/analyze", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ text: textToAnalyze }) // Match the key your Fastify server expects
-});
-
 const analyzeBtn = document.getElementById("analyzeBtn");
 const inputContent = document.getElementById("inputContent");
 const resultCard = document.getElementById("resultCard");
@@ -13,34 +7,48 @@ let history = [];
 
 analyzeBtn.addEventListener("click", async () => {
   const textToAnalyze = inputContent.value.trim();
-  if (!textToAnalyze) return alert("Please paste some text to analyze.");
+  if (!textToAnalyze) {
+    alert("Please paste some text to analyze.");
+    return;
+  }
 
   analyzeBtn.disabled = true;
   analyzeBtn.textContent = "Analyzing with AI...";
 
   try {
+    const RENDER_API_URL = "https://uottahack2026.onrender.com/api/analyze";
+
     const res = await fetch(RENDER_API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text: textToAnalyze }) 
+      body: JSON.stringify({ text: textToAnalyze })
     });
+
+    if (!res.ok) {
+      throw new Error(`Server error: ${res.status}`);
+    }
+
     const data = await res.json();
 
-    if (data.error) return document.getElementById("errorMsg").textContent = data.error;
+    if (data.error) {
+      document.getElementById("errorMsg").textContent = data.error;
+      return;
+    }
 
     displayStyledResult(data);
 
     history.unshift({ content: textToAnalyze, result: data.result });
     history = history.slice(0, 5);
     renderHistory();
+
   } catch (err) {
-    console.error(err);
+    console.error("Request failed:", err);
     document.getElementById("errorMsg").textContent = "Failed to connect to server.";
   } finally {
     analyzeBtn.disabled = false;
     analyzeBtn.textContent = "Analyze Content";
   }
-});
+}); 
 
 function displayStyledResult(data) {
   const badge = document.getElementById("statusBadge");
@@ -57,9 +65,16 @@ function displayStyledResult(data) {
   badge.className = "";
   confBar.className = "h-2 rounded-full transition-all duration-1000";
 
-  if (status === "safe") { badge.classList.add("safe-status"); confBar.classList.add("safe-bar"); }
-  else if (status === "scam") { badge.classList.add("scam-status"); confBar.classList.add("scam-bar"); }
-  else { badge.classList.add("suspicious-status"); confBar.classList.add("suspicious-bar"); }
+  if (status === "safe") {
+    badge.classList.add("safe-status");
+    confBar.classList.add("safe-bar");
+  } else if (status === "scam") {
+    badge.classList.add("scam-status");
+    confBar.classList.add("scam-bar");
+  } else {
+    badge.classList.add("suspicious-status");
+    confBar.classList.add("suspicious-bar");
+  }
 
   badge.textContent = status.toUpperCase();
   confText.textContent = `${score}%`;

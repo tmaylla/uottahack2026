@@ -1,3 +1,6 @@
+console.log("Starting ScamSense server...");
+console.log("Node version:", process.version);
+
 const fastify = require('fastify')({ logger: true });
 const cors = require('@fastify/cors');
 
@@ -30,6 +33,17 @@ fastify.post('/api/analyze', async (request, reply) => {
     );
 
     const data = await response.json();
+    if (
+      !data.candidates ||
+      !data.candidates[0] ||
+      !data.candidates[0].content ||
+      !data.candidates[0].content.parts ||
+      !data.candidates[0].content.parts[0] ||
+      !data.candidates[0].content.parts[0].text
+    ) {
+      fastify.log.error('Gemini response invalid:', data);
+      return reply.status(500).send({ error: 'AI response malformed' });
+    }
     
     // Extract the text content from Gemini's response
     let aiText = data.candidates[0].content.parts[0].text;
@@ -37,10 +51,19 @@ fastify.post('/api/analyze', async (request, reply) => {
     // Clean up any markdown code blocks Gemini might add
     aiText = aiText.replace(/```json|```/g, "").trim();
     
-    return JSON.parse(aiText);
+    let parsed;
+    try {
+      parsed = JSON.parse(aiText);
+    } catch (err) {
+      fastify.log.error('Failed to parse AI response JSON:', aiText);
+      return reply.status(500).send({ error: 'AI returned invalid JSON' });
+    }
+
+    return reply.send(parsed);
+
   } catch (err) {
-    fastify.log.error(err);
-    return reply.status(500).send({ error: "AI Analysis failed" });
+    fastify.log.error('Failed to connect to Gemini API:', err);
+    return reply.status(500).send({ error: 'AI analysis failed' });
   }
 });
 
