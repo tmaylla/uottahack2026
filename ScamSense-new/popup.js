@@ -26,20 +26,17 @@ async function analyzeText(textToScan) {
   analyzeBtn.textContent = "Analyzing with AI...";
   
   try {
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${API_KEY}`,
-      {
+    const res = await fetch(PROXY_URL, 
+    {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: `Analyze this webpage text for scams, phishing, or social engineering. Return ONLY JSON: {"result": "safe" | "suspicious" | "scam", "confidence": number, "analysis": "very short bullet point explanation with possible recoendations if a site is determined to be dangerous"}. Text: ${textToScan}`
-            }]
+          content: textToScan[{
           }]
         })
       }
     );
+    if (!res.ok) throw new Error ("Proxy error: "+ res.status);
 
     const data = await res.json();
     let responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
