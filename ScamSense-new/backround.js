@@ -1,4 +1,4 @@
-const API_KEY = "AIzaSyB7V86BHgtwc7-7_tA41343dsgMW9h90RU";
+const API_KEY = "AIzaSyDsDQ0_phtYpgadcFzNFE1VDmgmXukU46E";
 
 // Helper to get text content from a tab
 async function getPageText(tabId) {
@@ -31,7 +31,7 @@ async function analyzeContent(url, pageText) {
               URL: ${url}
               Visible Text Content: ${trimmedText}
               
-              Return ONLY a JSON object: {"result": "safe" | "suspicious" | "scam", "confidence": 0-100, "analysis": "Short bullet points with recommendations."}` 
+              Return ONLY a JSON object: {"result": "safe" | "suspicious" | "scam", "confidence": 0-100, "analysis": "very short bullet point explanation with possible recoendations if a site is determined to be dangerous. You should avoid suspision of thinks like unupened emails as this will make all email services apear to be a scam but you should still mark opened scam emails like ones from suspisous senders sneding promos or about missing items"}` 
             }]
           }]
         })
@@ -64,16 +64,13 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     // 2. Call AI with both URL and page text
     const aiResponse = await analyzeContent(tab.url, pageText);
 
-    if (aiResponse) {
-      chrome.notifications.create({
-        type: "basic",
-        iconUrl: "icon.png",
-        title: `Scam Check: ${aiResponse.result.toUpperCase()}`,
-        message: `${aiResponse.analysis} (Accuracy: ${aiResponse.confidence}%)`,
-        priority: aiResponse.result === "scam" ? 2 : 0
-      });
-    }
+  if (aiResponse && (aiResponse.result === "scam" || aiResponse.result === "suspicious")) {
+    // Instead of a notification, send a message to the webpage
+    chrome.tabs.sendMessage(tabId, {
+        action: "show_warning",
+        data: aiResponse
+    });
+}
   }
 });
 
-chrome.tabs.onRemoved.addListener((tabId) => delete lastNotifiedDomains[tabId]);
