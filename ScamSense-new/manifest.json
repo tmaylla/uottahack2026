@@ -17,14 +17,16 @@
   ],
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
+      "matches": ["https://mail.google.com/*","<all_urls>"],
       "js": ["content.js"],
       "run_at": "document_idle"
+      "all_frames": true
     }
   ],
   "host_permissions": [
 "https://uottahack2026.onrender.com/*" ,
-        "<all_urls>"
+        "<all_urls>",
+        "https://mail.google.com/*"
 ]
 }
 
