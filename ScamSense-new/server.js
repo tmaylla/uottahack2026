@@ -17,7 +17,7 @@ fastify.post('/api/analyze', async (request, reply) => {
   }
 
   // The prompt given to gemini
-  const prompt = `You are a security expert. Analyze the following content for phishing, scams, or suspicious patterns.
+  const prompt = `You are a security expert. Analyze the following content for phishing, scams, or suspicious patterns, be especially suspisious of emials from misspled addresses or ones that don't match up with email content. .
   
 Return ONLY a valid JSON object with this structure:
 {
