@@ -1,5 +1,4 @@
-const API_KEY = "AIzaSyDb_kyFSbQHVdP31BV14s4uCUoLb-yMX-g";
-let lastNotifiedDomains = {};
+const API_KEY = "AIzaSyB7V86BHgtwc7-7_tA41343dsgMW9h90RU";
 
 // Helper to get text content from a tab
 async function getPageText(tabId) {
@@ -57,10 +56,7 @@ async function analyzeContent(url, pageText) {
 
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   if (changeInfo.status === "complete" && tab.url && tab.url.startsWith("http")) {
-    const domain = new URL(tab.url).hostname;
-
-    if (lastNotifiedDomains[tabId] === domain) return;
-    lastNotifiedDomains[tabId] = domain;
+   
 
     // 1. Grab the text from the current page
     const pageText = await getPageText(tabId);
