@@ -22,10 +22,11 @@ function getPageContent() {
 }
 
 function sendToAnalysis() {
+    if (document.getElementById('phish-overlay')) return;
     const text = getPageContent();
     const url = location.href;
 
-    // àDon't send if text is too short or hasn't changed
+    // Don't send if text is too short or hasn't changed
     if (text.length < 200) return;
     if (text === lastProcessedText && url === lastUrl) return;
 
@@ -53,9 +54,12 @@ window.addEventListener('load', sendToAnalysis);
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "show_warning") {
         const { result, confidence, analysis } = request.data;
+
+        if (document.getElementById('phish-overlay')) return;
         
         // Create the Overlay
         const overlay = document.createElement('div');
+        overlay.id = 'phish-overlay';
         overlay.style = `
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.85); z-index: 999999;
