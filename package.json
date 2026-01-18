@@ -1,5 +1,10 @@
 {
-  "name": "fish.net",
+  "name": "scamsense-api",
   "version": "1.0.0",
-  "main": "popup.js"
+  "scripts": {
+    "start": "node ScamSense-new/api/server.js"
+  },
+  "dependencies": {
+    "fastify": "^5.0.0"
+  }
 }
