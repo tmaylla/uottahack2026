@@ -1,3 +1,55 @@
+let lastProcessedText = "";
+let lastUrl = location.href;
+let debounceTimer;
+
+function getPageContent() {
+    // Priority list of selectors for Emails and Web Content
+    const selectors = [
+        '.a3s.aiL',                            // Gmail
+        '[aria-label="Message body"]',          // Outlook
+        '.msg-body',                            // Yahoo
+        'main',                                 // Modern web standard
+        'article'                               // Blog/News standard
+    ];
+
+    for (const s of selectors) {
+        const el = document.querySelector(s);
+        if (el && el.innerText.trim().length > 150) {
+            return el.innerText.trim();
+        }
+    }
+    return document.body.innerText.trim();
+}
+
+function sendToAnalysis() {
+    const text = getPageContent();
+    const url = location.href;
+
+    // àDon't send if text is too short or hasn't changed
+    if (text.length < 200) return;
+    if (text === lastProcessedText && url === lastUrl) return;
+
+    lastProcessedText = text;
+    lastUrl = url;
+
+    chrome.runtime.sendMessage({
+        type: "ANALYZE_PAGE",
+        url: url,
+        text: text.substring(0, 5000)
+    });
+}
+
+// Watch for dynamic content loading (essential for SPA like Gmail/Outlook)
+const observer = new MutationObserver(() => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(sendToAnalysis, 2000); 
+});
+observer.observe(document.body, { childList: true, subtree: true });
+
+// Initial scan on page load
+window.addEventListener('load', sendToAnalysis);
+
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "show_warning") {
         const { result, confidence, analysis } = request.data;

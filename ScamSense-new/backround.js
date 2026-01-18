@@ -1,65 +1,75 @@
-// Remove the hardcoded API_KEY
-// const API_KEY = "AIzaSyDsDQ0_phtYpgadcFzNFE1VDmgmXukU46E";
+// Memory cache to save results and prevent re-calling Gemini for the same page
+const analysisCache = new Map();
 
-// Helper to get text content from a tab
-async function getPageText(tabId) {
-  try {
-    const results = await chrome.scripting.executeScript({
-      target: { tabId: tabId },
-      func: () => document.body.innerText,
-    });
-    return results[0].result;
-  } catch (err) {
-    console.error("Failed to extract text:", err);
-    return "";
-  }
-}
 
-// Call your server instead of Gemini directly
-async function analyzeContent(url, pageText) {
-  try {
-    const trimmedText = pageText.substring(0, 5000);
-
-    // Server endpoint instead of direct Gemini API
-    const res = await fetch("https://uottahack2026.onrender.com/api/analyze", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-  url: url,
-  content: trimmedText
-})
-    });
-
-    const data = await res.json();
-
-    if (data.error) {
-      console.error("Server API Error:", data.error);
-      console.error("Server API Error:", data.error);
-      return null;
+async function callScamSenseAPI(url, content) {
+    // 1. Check if we already have a result for this URL
+    if (analysisCache.has(url)) {
+        console.log("ScamSense: Using cached result for:", url);
+        return analysisCache.get(url);
     }
 
-    return data; // already a parsed JSON object from server
-  } catch (err) {
-    console.error("AI Analysis Error:", err);
-    return null;
-  }
+    try {
+        console.log("ScamSense: Sending request to server...");
+        
+        const response = await fetch("https://uottahack2026.onrender.com/api/analyze", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+                url: url, 
+                content: content 
+            })
+        });
+
+        
+        if (response.status === 429) {
+            return { result: "error", analysis: "Rate limit reached. Please wait a minute." };
+        }
+
+        if (!response.ok) {
+            throw new Error(`Server returned ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        // 2. Save the result in cache if successful
+        if (data && data.result) {
+            analysisCache.set(url, data);
+        }
+        
+        return data;
+
+    } catch (err) {
+        console.error("ScamSense API Error:", err);
+        return null;
+    }
 }
 
-chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
-  if (changeInfo.status === "complete" && tab.url && tab.url.startsWith("http")) {
-
-    // 1. Grab the text from the current page
-    const pageText = await getPageText(tabId);
-
-    // 2. Call your server with both URL and page text
-    const aiResponse = await analyzeContent(tab.url, pageText);
-
-    if (aiResponse && (aiResponse.result === "scam" || aiResponse.result === "suspicious")) {
-      // Send a message to the webpage to show warning
-      chrome.tabs.sendMessage(tabId, {
-        action: "show_warning",
-        data: aiResponse
-      });
+/**
+ * Listen for messages from content.js
+ */
+chrome.runtime.onMessage.addListener((message, sender) => {
+    if (message.type === "ANALYZE_PAGE" && sender.tab) {
+        
+        // Trigger the analysis
+        callScamSenseAPI(message.url, message.text).then(data => {
+            
+            // Only show the warning if the result is NOT "safe"
+            if (data && (data.result === "scam" || data.result === "suspicious")) {
+                chrome.tabs.sendMessage(sender.tab.id, {
+                    action: "show_warning",
+                    data: data
+                });
+            }
+        });
     }
-  }
+    // Required to keep the message port open for the async fetch
+    return true; 
+});
+
+/**
+ * Clean up memory when a tab is closed
+ */
+chrome.tabs.onRemoved.addListener((tabId) => {
+   
 });
