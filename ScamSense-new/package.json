@@ -2,7 +2,7 @@
   "name": "phish.net_api",
   "version": "1.0.0",
   "scripts": {
-    "start": "node ScamSense-new/popup.js"
+    "start": "node popup.js"
   },
   "dependencies": {
     "fastify": "^5.0.0"
