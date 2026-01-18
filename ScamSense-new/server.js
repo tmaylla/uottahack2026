@@ -59,6 +59,12 @@ CHECK FOR:
 - Fake login pages
 - Brand impersonation
 
+CONFIDENCE GUIDELINES:
+90–100: Clear scam with multiple strong indicators
+60–89: High risk but missing one element
+30–59: Some red flags, inconclusive
+0–29: No meaningful risk indicators
+
 FORMAT:
 {
   "result": "safe" | "suspicious" | "scam",

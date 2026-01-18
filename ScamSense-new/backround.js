@@ -34,7 +34,7 @@ async function analyzeContent(url, pageText) {
 
     if (data.error) {
       console.error("Server API Error:", data.error);
-      document.getElementById("errorMsg").textContent = `API Error: ${data.error}`;
+      console.error("Server API Error:", data.error);
       return null;
     }
 

@@ -22,6 +22,8 @@
     }
   ],
   "host_permissions": [
-"https://uottahack2026.onrender.com/*"  ]
+"https://uottahack2026.onrender.com/*" ,
+        "<all_urls"
+]
 }
 
