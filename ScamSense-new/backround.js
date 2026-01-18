@@ -1,52 +1,79 @@
-const API_KEY = "AIzaSyD74zbKZRrThGpF-Em0HLIIGUHxHe_6SVA";
+const API_KEY = "AIzaSyDb_kyFSbQHVdP31BV14s4uCUoLb-yMX-g";
 let lastNotifiedDomains = {};
 
-// 1. AI Analysis Function
-async function analyzeUrl(url) {
+// Helper to get text content from a tab
+async function getPageText(tabId) {
   try {
+    const results = await chrome.scripting.executeScript({
+      target: { tabId: tabId },
+      func: () => document.body.innerText,
+    });
+    return results[0].result;
+  } catch (err) {
+    console.error("Failed to extract text:", err);
+    return "";
+  }
+}
+
+async function analyzeContent(url, pageText) {
+  try {
+    // Trim text to 5000 chars to avoid token limits
+    const trimmedText = pageText.substring(0, 5000);
+    
     const res = await fetch(
-     // `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${API_KEY}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           contents: [{
-            parts: [{ text: `Analyze this URL for scams/phishing: "${url}". Return ONLY a JSON object with: {"result": "safe" | "suspicious" | "scam", "confidence": 0-100, "analysis": "short explanation"}` }]
+            parts: [{ 
+              text: `Analyze this website for scams. 
+              URL: ${url}
+              Visible Text Content: ${trimmedText}
+              
+              Return ONLY a JSON object: {"result": "safe" | "suspicious" | "scam", "confidence": 0-100, "analysis": "Short bullet points with recommendations."}` 
+            }]
           }]
         })
       }
     );
+    
     const data = await res.json();
-    // Clean the string in case Gemini adds markdown code blocks
-    const cleanJson = data.candidates[0].content.parts[0].text.replace(/```json|```/g, "");
+//for when it get error 403 (usualy when the key is getting blocked)
+    if (data.error) {
+      console.error("Gemini Error Message:", data.error.message);
+      document.getElementById("errorMsg").textContent = `API Error: ${data.error.message}`;
+      return;
+    }
+    const text = data.candidates[0].content.parts[0].text;
+    const cleanJson = text.replace(/```json|```/g, "").trim();
     return JSON.parse(cleanJson);
   } catch (err) {
-    console.error("AI Error:", err);
+    console.error("AI Analysis Error:", err);
     return null;
   }
 }
 
-// 2. Tab Update Listener
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   if (changeInfo.status === "complete" && tab.url && tab.url.startsWith("http")) {
     const domain = new URL(tab.url).hostname;
 
-    // Only scan if it's a new domain for this tab
     if (lastNotifiedDomains[tabId] === domain) return;
     lastNotifiedDomains[tabId] = domain;
 
-    console.log("Scanning new domain:", domain);
+    // 1. Grab the text from the current page
+    const pageText = await getPageText(tabId);
 
-    // Call the AI
-    const aiResponse = await analyzeUrl(tab.url);
+    // 2. Call AI with both URL and page text
+    const aiResponse = await analyzeContent(tab.url, pageText);
 
     if (aiResponse) {
-      // 3. Create Notification based on AI result
       chrome.notifications.create({
         type: "basic",
         iconUrl: "icon.png",
         title: `Scam Check: ${aiResponse.result.toUpperCase()}`,
-        message: `${aiResponse.analysis} (Confidence: ${aiResponse.confidence}%)`,
+        message: `${aiResponse.analysis} (Accuracy: ${aiResponse.confidence}%)`,
         priority: aiResponse.result === "scam" ? 2 : 0
       });
     }

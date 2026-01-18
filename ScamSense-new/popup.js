@@ -1,5 +1,5 @@
 
-const API_KEY = "AIzaSyD74zbKZRrThGpF-Em0HLIIGUHxHe_6SVA";
+const PROXY_URL = "https://ottaproxpriv.vercel.app/api/analyze";
 
 const analyzeBtn = document.getElementById("analyzeBtn");
 const inputContent = document.getElementById("inputContent");
@@ -9,15 +9,22 @@ const historyList = document.getElementById("historyList");
 const history = [];
 
 analyzeBtn.addEventListener("click", async () => {
-  const content = inputContent.value.trim();
-  if (!content) return;
+  const textToAnalyze = inputContent.value.trim();
+  if (!textToAnalyze) {
+    alert("Please paste some text to analyze.");
+    return;
+  }
 
-  // Reset UI for new scan
   analyzeBtn.disabled = true;
-  analyzeBtn.textContent = "⏳ Analyzing...";
-  //resultCard.textContent = "";
-  document.getElementById("resultCard").classList.add("hidden");
+  analyzeBtn.textContent = "Analyzing...";
+  
+  // Call the analysis function directly using the textarea content
+  analyzeText(textToAnalyze);
+});
 
+async function analyzeText(textToScan) {
+  analyzeBtn.textContent = "Analyzing with AI...";
+  
   try {
     const res = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${API_KEY}`,
@@ -27,43 +34,27 @@ analyzeBtn.addEventListener("click", async () => {
         body: JSON.stringify({
           contents: [{
             parts: [{
-              text: `Analyze this content for scams/phishing. Return ONLY a JSON object: {"result": "safe" | "suspicious" | "scam", "confidence": number, "analysis": "short explanation"}. Content: ${content}`
+              text: `Analyze this webpage text for scams, phishing, or social engineering. Return ONLY JSON: {"result": "safe" | "suspicious" | "scam", "confidence": number, "analysis": "very short bullet point explanation with possible recoendations if a site is determined to be dangerous"}. Text: ${textToScan}`
             }]
           }]
         })
       }
     );
 
-    if (!res.ok) throw new Error("API Request Failed");
-
     const data = await res.json();
-    let text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
-    
-    // Clean potential markdown code blocks
-    text = text.replace(/```json|```/g, "").trim();
+    let responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    responseText = responseText.replace(/```json|```/g, "").trim();
 
-    try {
-      const parsed = JSON.parse(text);
-      displayStyledResult(parsed);
-      
-      // Add to history list
-      history.unshift({
-        content: content.substring(0, 40) + "...",
-        result: parsed.result
-      });
-      renderHistory();
-    } catch (e) {
-      // If AI fails to send JSON, show raw text
-      resultCard.textContent = text;
-    }
+    const parsed = JSON.parse(responseText);
+    displayStyledResult(parsed);
 
   } catch (err) {
     document.getElementById("errorMsg").textContent = "Error: " + err.message;
-} finally {
+  } finally {
     analyzeBtn.disabled = false;
-    analyzeBtn.textContent = "Analyze Content";
+    analyzeBtn.textContent = "Analyze Page";
   }
-});
+};
 
 function displayStyledResult(data) {
     const card = document.getElementById("resultCard");
