@@ -25,12 +25,9 @@ async function analyzeContent(url, pageText) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        text: `Analyze this text for scams or phishing be aware of emails from suspicious senders or typos.
-URL: ${url}
-Visible Text Content: ${trimmedText}
-
- Return ONLY a JSON object: {"result": "safe" | "suspicious" | "scam", "confidence": 0-100, "analysis": "very short bullet point explanation with possible recoendations if a site or specific email that is currently being displayed is determined to be dangerous."}`
-      })
+  url: url,
+  content: trimmedText
+})
     });
 
     const data = await res.json();
