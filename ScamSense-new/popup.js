@@ -1,4 +1,8 @@
-const PROXY_URL = "https://ottaproxpriv.vercel.app/api/analyze";
+const res = await fetch("https://uottahack2026.onrender.com/api/analyze", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ text: textToAnalyze }) // Match the key your Fastify server expects
+});
 
 const analyzeBtn = document.getElementById("analyzeBtn");
 const inputContent = document.getElementById("inputContent");
@@ -15,10 +19,10 @@ analyzeBtn.addEventListener("click", async () => {
   analyzeBtn.textContent = "Analyzing with AI...";
 
   try {
-    const res = await fetch(PROXY_URL, {
+    const res = await fetch(RENDER_API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ content: textToAnalyze })
+      body: JSON.stringify({ text: textToAnalyze }) 
     });
     const data = await res.json();
 

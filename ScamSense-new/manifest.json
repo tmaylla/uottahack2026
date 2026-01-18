@@ -15,8 +15,13 @@
     "scripting",
     "notifications"
   ],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ],
   "host_permissions": [
-    "https://ottaproxpriv.vercel.app/*"
-  ]
+"https://uottahack2026.onrender.com"  ]
 }
 
