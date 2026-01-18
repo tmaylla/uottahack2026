@@ -9,12 +9,11 @@
     <link rel="stylesheet" href="style2.css" />
 </head>
 <body class="bg-gray-950 text-white min-h-screen p-6">
-
+<div class="window-mask">
 <div class="max-w-2xl mx-auto">
-    <h1 class="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-        Phish.net
-    </h1>
-
+    <div class="flex justify-center mb-6">
+        <img src="demo.png" alt="Phish.net Logo" class="app-logo">
+    </div>
     <div class="space-y-4">
         <textarea id="inputContent" placeholder="Paste suspicious text or URL..." class="w-full h-32 p-4 bg-gray-900 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"></textarea>
         <button id="analyzeBtn" class="w-full py-3 bg-blue-600 hover:bg-blue-700 font-bold rounded-lg transition-colors shadow-lg shadow-blue-900/20">
@@ -51,5 +50,6 @@
 </div>
 
 <script src="popup.js"></script>
+</div>
 </body>
 </html>
