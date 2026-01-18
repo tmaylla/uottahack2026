@@ -16,9 +16,18 @@ fastify.post('/api/analyze', async (request, reply) => {
     return reply.status(400).send({ error: "No text provided" });
   }
 
-  const prompt = `Analyze this text for scams or phishing be aware of emails from suspicious senders or typos. 
- Return ONLY a JSON object: {"result": "safe" | "suspicious" | "scam", "confidence": 0-100, "analysis": "very short bullet point explanation with possible recoendations if a site or specific email that is currently being displayed is determined to be dangerous."}
-  Text: ${text}`;
+  // The prompt given to gemini
+  const prompt = `You are a security expert. Analyze the following content for phishing, scams, or suspicious patterns.
+  
+Return ONLY a valid JSON object with this structure:
+{
+  "result": "safe" | "suspicious" | "scam",
+  "confidence": 0-100,
+  "analysis": "Short bullet point explanation with recommendations."
+}
+
+Content to analyze:
+${text}`;
 
   try {
     const response = await fetch(
