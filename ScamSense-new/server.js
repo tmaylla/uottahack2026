@@ -16,7 +16,7 @@ fastify.post('/api/analyze', async (request, reply) => {
     return reply.status(400).send({ error: "No text provided" });
   }
 
-  const prompt = `Analyze this text for scams or phishing. 
+  const prompt = `Analyze this text for scams or phishing be aware of emails from suspicious senders or typos. 
  Return ONLY a JSON object: {"result": "safe" | "suspicious" | "scam", "confidence": 0-100, "analysis": "very short bullet point explanation with possible recoendations if a site or specific email that is currently being displayed is determined to be dangerous."}
   Text: ${text}`;
 

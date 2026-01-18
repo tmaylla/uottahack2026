@@ -25,7 +25,7 @@ async function analyzeContent(url, pageText) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        text: `Analyze this website for scams. 
+        text: `Analyze this text for scams or phishing be aware of emails from suspicious senders or typos.
 URL: ${url}
 Visible Text Content: ${trimmedText}
 
