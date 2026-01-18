@@ -2,7 +2,7 @@
   "name": "scamsense-api",
   "version": "1.0.0",
   "scripts": {
-    "start": "node ScamSense-new/api/server.js"
+    "start": "node ScamSense-new/api/popup.js"
   },
   "dependencies": {
     "fastify": "^5.0.0"
